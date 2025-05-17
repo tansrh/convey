@@ -1,9 +1,10 @@
 import protectRoute from "./middleware/protectRoute";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
+const protectedApis: string[] = ["/api/me", "/api/messages", "/api/messages/conversations", "/api/messages/users"]
 export async function middleware(request: NextRequest) {
-    if (request.nextUrl.pathname.startsWith("/api/me") && !request.nextUrl.pathname.startsWith("/api/(auth)")) {
+    const pathName: string  = request.nextUrl.pathname;
+    if (protectedApis.some((api)=> pathName.includes(api))) {
         const response = await protectRoute(request);
         if (response.status !== 200) {
             return response;

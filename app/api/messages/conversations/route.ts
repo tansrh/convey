@@ -1,4 +1,4 @@
-import prisma from "@/db/prisma"
+import prisma from "@/db/prisma";
 import { NextRequest } from "next/server";
 
 export const GET = async (request: NextRequest) => {
@@ -10,8 +10,21 @@ export const GET = async (request: NextRequest) => {
                 { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }
-        const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, username: true, fullName: true, profilePic: true } });
-        return new Response(JSON.stringify({ user }), {
+        const conversations = await prisma.conversation.findMany({
+            where: {
+                participantId: {
+                    has: userId
+                }
+            },
+            include: {
+                messages: {
+                    orderBy: {
+                        createdAt: "asc"
+                    }
+                }
+            }
+        });
+        return new Response(JSON.stringify({ conversations }), {
             status: 200,
             headers: { "Content-Type": "application/json" }
         });
